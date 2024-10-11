@@ -10,6 +10,9 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
+const cartRoutes = require('./routes/cartRoutes');
+const shippingRoutes = require('./routes/shippingRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 dotenv.config();
 
@@ -23,7 +26,12 @@ app.use(express.json()); // To parse JSON data from requests
 app.get('/', (req, res) => {
     res.send('API is running...');
   });
+  
   app.use('/api/users', userRoutes);
+  app.use('/api/cart', cartRoutes);
+  app.use('/api/shipping', shippingRoutes)
+  app.use('/api/create-checkout-session', paymentRoutes);
+
   // Connect to MongoDB
   mongoose.connect(process.env.MONGO_URI).then(() => console.log('MongoDB connected'))
   .catch(err => console.log("++++ Error in mongodb connection +++++",err));

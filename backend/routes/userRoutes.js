@@ -16,21 +16,25 @@ const router = express.Router();
 
 router.post('/register', async(req,res) => {
  
-    const {name , email, password, phone} = req.body;
+    const {name , email, password, phone,img} = req.body;
     try {
         let user = await User.findOne({ email });
-        if(user) return res.status(400).json({msg:'User already exists'});
+        if(!!user) return res.status(400).json({msg:'User already exists'});
 
         user = new User({ name, phone, email, password: bcrypt.hashSync(password, 10) });
         await user.save();
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15d' });
         res.cookie('token', token, { httpOnly: true }).json({ user: { 
-            id: user._id, name: user.name,
+            id: user._id,
+            name:  user.name,
             phone: user.phone,
-             email: user.email } });
+            email: user.email,
+            token: token 
+          }});
     }
     catch(err){
+      console.log("++++ Error in register user ++++",err)
         res.status(500).json({msg: "Server Error"});
     }
 })
@@ -45,13 +49,18 @@ router.post('/login', async (req, res) => {
       const isMatch = bcrypt.compareSync(password, user.password);
       if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
   
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15d' });
       res.cookie('token', token, { httpOnly: true }).json({ user: { 
-        id: user._id, name: user.name,
-        phone: user.phone,
-         email: user.email
-       } });
+        id: user._id,
+         name: user.name,
+         phone: user.phone,
+         email: user.email,
+         token: token
+
+       }});
+
     } catch (err) {
+      console.log("++++ Error in login user ++++",err)
       res.status(500).json({ msg: 'Server error' });
     }
   });

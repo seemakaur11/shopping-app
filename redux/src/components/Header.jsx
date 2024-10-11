@@ -1,18 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import { useDispatch,useSelector } from 'react-redux';
 import { FaUser, FaShoppingCart } from "react-icons/fa";
 import { MdLogout,MdLogin  } from "react-icons/md";
 import { logout } from "../redux/slices/authSlice";
+import { clearCart, fetchCart } from "../redux/slices/cartSlice";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+
+  // useEffect(()=>{
+  //   if(!!user){
+  //     dispatch(fetchCart())
+  //   }
+  // },[dispatch,user]);
+
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(clearCart());
 };
+
+const cartCount = !!cartItems && cartItems?.reduce((acc, item) => acc + item.quantity, 0);
+
   return (
     <>
       <div className="w-full h-[75px] sticky top-0 bg-white shadow-md z-50 px-24">
@@ -58,7 +71,12 @@ const Header = () => {
                   Home{" "}
                 </a>
               </li>
-              <li className="pt-3"><FaShoppingCart className="text-xl"/></li>
+              <li className="pt-3 flex gap-3"><Link to="/cart"><FaShoppingCart className="text-2xl"/> </Link>
+              <div className="relative bottom-4 right-2"> 
+                <span className=" bg-red-600 px-2  py-1 text-[11px] rounded-full text-white">
+                  {cartCount}</span>
+                   </div>
+              </li>
               {user ? (
                 <>
                 <li className="pt-2">

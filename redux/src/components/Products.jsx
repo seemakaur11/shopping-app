@@ -1,11 +1,31 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector  } from "react-redux";
 import { Products } from "../utility/data";
-import { addItem } from "../redux/slices/cartSlice";
 import { CiSearch } from "react-icons/ci";
+import { addToCart } from "../redux/slices/cartSlice";
+import { toast, ToastContainer } from 'react-toastify';
 
 const Product = () => {
   const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth); 
+  const { cartItems } = useSelector((state) => state.cart);
+
+  const handleAddToCart = (productId,name,price,img) => {
+    const totalPrice = price;
+    if(!token) {
+      toast.error('Please log in to add items to the cart!', {
+        position: "top-right",
+        autoClose: 3000,  // Auto close after 3 seconds
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } else {
+      dispatch(addToCart({ productId: productId, quantity: 1, name:name, price:price,img:img, totalPrice:totalPrice }))
+    }
+  } 
 
   return (
     <>
@@ -29,16 +49,18 @@ const Product = () => {
                 <div className="p-3">
                   <button
                     onClick={(e) =>
-                      dispatch(addItem({ name: name, price: price }))
+                      handleAddToCart(product.id,name,price,img)
                     }
                     className="bg-[#dd82ee] text-white text-[12px] py-2 px-2 rounded-sm"
                   >
                     Add To Cart
                   </button>
+                
                 </div>
               </div>
             );
           })}
+          <ToastContainer/>
       </div>
     </>
   );

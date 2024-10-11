@@ -14,7 +14,7 @@ export const signupUser = createAsyncThunk(
         body: JSON.stringify(userData),
       });
       const data = await response.json();
-      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("user", JSON.stringify(data.user));
       if (!response.ok) {
         throw new Error(data.msg || "Failed to sign up");
       }
@@ -38,7 +38,7 @@ export const userLogin = createAsyncThunk(
         body: JSON.stringify(userData),
       });
       const data = await response.json();
-
+      localStorage.setItem("user", JSON.stringify(data.user));
       if (!response.ok) {
         throw new Error(data.msg || "Failed to sign up");
       }
@@ -49,10 +49,10 @@ export const userLogin = createAsyncThunk(
   }
 );
 
+
 const userInfoFromStorage = localStorage.getItem("user")
   ? JSON.parse(localStorage.getItem("user"))
   : null;
-  
 // Auth Slice
 const authSlice = createSlice({
   name: "auth",
@@ -60,6 +60,7 @@ const authSlice = createSlice({
     user: userInfoFromStorage,
     loading: false,
     error: null,
+    token: userInfoFromStorage?.token
   },
 
   reducers: {
@@ -79,6 +80,7 @@ const authSlice = createSlice({
       .addCase(userLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        state.token = action.payload
       })
       .addCase(userLogin.rejected, (state, action) => {
         state.loading = false;

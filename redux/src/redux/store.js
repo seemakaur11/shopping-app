@@ -1,12 +1,16 @@
 
 import {configureStore} from '@reduxjs/toolkit';
-// import cartReducer from './slices/cartSlice';
 import authReducer  from './slices/authSlice';
+import cartReducer from './slices/cartSlice';
+import shippingReducer from './slices/shippingSlice';
+import paymentReducer from './slices/paymentSlice';
 
 export const store = configureStore({
     reducer: {
-        // cart: cartReducer
-        auth: authReducer
+        auth: authReducer,
+        cart: cartReducer,
+        shipping: shippingReducer,
+        payment: paymentReducer
     },
     devTools: true
 })
